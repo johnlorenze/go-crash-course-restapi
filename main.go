@@ -32,13 +32,13 @@ type Author struct {
 
 // Get All Books
 func getBooks(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(books)
 }
 
 // Get Single Book
 func getBook(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	params := mux.Vars(r) // Get params
 	// Loop through books and find with ID
 	for _, item := range books {
@@ -52,7 +52,7 @@ func getBook(w http.ResponseWriter, r *http.Request) {
 
 // Create a new book
 func createBook(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	var book Book
 	_ = json.NewDecoder(r.Body).Decode(&book)
 	book.ID = strconv.Itoa(rand.Intn(10000000))
@@ -62,7 +62,7 @@ func createBook(w http.ResponseWriter, r *http.Request) {
 
 // Update a book
 func updateBook(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	params := mux.Vars(r)
 	for index, item := range books {
 		if item.ID == params["id"] {
@@ -80,7 +80,7 @@ func updateBook(w http.ResponseWriter, r *http.Request) {
 
 // Delete a book
 func deleteBook(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	params := mux.Vars(r)
 	for index, item := range books {
 		if item.ID == params["id"] {
