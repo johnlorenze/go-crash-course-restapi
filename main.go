@@ -32,6 +32,7 @@ type Author struct {
 
 // Get All Books
 func getBooks(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(books)
 }
@@ -80,6 +81,7 @@ func updateBook(w http.ResponseWriter, r *http.Request) {
 
 // Delete a book
 func deleteBook(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	params := mux.Vars(r)
 	for index, item := range books {
@@ -120,7 +122,7 @@ func main() {
 	r.HandleFunc("/api/books/{id}", getBook).Methods("GET")
 	r.HandleFunc("/api/books", createBook).Methods("POST")
 	r.HandleFunc("/api/books/{id}", updateBook).Methods("PUT")
-	r.HandleFunc("/api/books/{id}", deleteBook).Methods("DELETE")
+	r.HandleFunc("/api/books/{id}", deleteBook).Methods("DELETE", "OPTIONS")
 
 	fmt.Println("listening...")
 	err := http.ListenAndServe(GetPort(), r)
