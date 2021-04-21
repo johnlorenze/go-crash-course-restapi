@@ -82,6 +82,11 @@ func updateBook(w http.ResponseWriter, r *http.Request) {
 
 // Delete a book
 func deleteBook(w http.ResponseWriter, r *http.Request) {
+	setupResponse(w, r)
+	if (*r).Method == "OPTIONS" {
+		return
+	}
+
 	w.Header().Set("content-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	params := mux.Vars(r)
@@ -92,6 +97,12 @@ func deleteBook(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	json.NewEncoder(w).Encode(books)
+}
+
+func setupResponse(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
