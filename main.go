@@ -91,22 +91,42 @@ func deleteBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(books)
 }
 
+func handler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hello. This is our first Go web app on Heroku!")
+}
+
+func GetPort() string {
+	godotenv.Load()
+	var port = os.Getenv("PORT")
+	// Set a default port if there is nothing in the environment
+	if port == "" {
+		port = "8000"
+		fmt.Println("INFO: No PORT environment variable detected, defaulting to " + port)
+	}
+	return ":" + port
+}
+
 func main() {
 	// Init Router
 	r := mux.NewRouter()
-	godotenv.Load()
-	port := os.Getenv("PORT")
-	fmt.Println("Server is runningin port", port)
+
 	// Mock Data
 	books = append(books, Book{ID: "1", Isbn: "448743", Title: "Book One", Author: &Author{Firstname: "John", Lastname: "Doe"}})
 	books = append(books, Book{ID: "2", Isbn: "548743", Title: "Book Two", Author: &Author{Firstname: "Bob", Lastname: "Smith"}})
 
 	// Route Handlers / Endpoints
+	r.HandleFunc("/", handler)
 	r.HandleFunc("/api/books", getBooks).Methods("GET")
 	r.HandleFunc("/api/books/{id}", getBook).Methods("GET")
 	r.HandleFunc("/api/books", createBook).Methods("POST")
 	r.HandleFunc("/api/books/{id}", updateBook).Methods("PUT")
 	r.HandleFunc("/api/books/{id}", deleteBook).Methods("DELETE")
 
-	log.Fatal(http.ListenAndServe(":8000", r))
+	fmt.Println("listening...")
+	err := http.ListenAndServe(GetPort(), r)
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
+	}
+
+	//log.Fatal(http.ListenAndServe(":8000", r))
 }
