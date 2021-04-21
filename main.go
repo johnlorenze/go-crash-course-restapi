@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
@@ -122,10 +123,10 @@ func main() {
 	r.HandleFunc("/api/books/{id}", getBook).Methods("GET")
 	r.HandleFunc("/api/books", createBook).Methods("POST")
 	r.HandleFunc("/api/books/{id}", updateBook).Methods("PUT")
-	r.HandleFunc("/api/books/{id}", deleteBook).Methods("DELETE", "OPTIONS")
+	r.HandleFunc("/api/books/{id}", deleteBook).Methods("DELETE")
 
 	fmt.Println("listening...")
-	err := http.ListenAndServe(GetPort(), r)
+	err := http.ListenAndServe(GetPort(), handlers.CORS()(r))
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
