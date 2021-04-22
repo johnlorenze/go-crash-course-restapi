@@ -84,6 +84,7 @@ func updateBook(w http.ResponseWriter, r *http.Request) {
 func deleteBook(w http.ResponseWriter, r *http.Request) {
 	setupCorsResponse(&w, r)
 	if (*r).Method == "OPTIONS" {
+		fmt.Println("OPTIONS ARE CALLED")
 		return
 	}
 
@@ -134,7 +135,7 @@ func main() {
 	r.HandleFunc("/api/books/{id}", getBook).Methods("GET")
 	r.HandleFunc("/api/books", createBook).Methods("POST")
 	r.HandleFunc("/api/books/{id}", updateBook).Methods("PUT")
-	r.HandleFunc("/api/books/{id}", deleteBook).Methods("DELETE")
+	r.HandleFunc("/api/books/{id}", deleteBook).Methods("DELETE", "OPTIONS")
 
 	fmt.Println("listening...")
 	err := http.ListenAndServe(GetPort(), handlers.CORS()(r))
