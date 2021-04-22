@@ -11,7 +11,6 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
-	"github.com/rs/cors"
 )
 
 // Init books var as a slice Book struct
@@ -144,10 +143,10 @@ func main() {
 
 	fmt.Println("listening...")
 
-	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"},
-		AllowCredentials: true,
-	})
+	// c := cors.New(cors.Options{
+	// 	AllowedOrigins:   []string{"http://localhost:3000"},
+	// 	AllowCredentials: true,
+	// })
 
 	// handler := c.Handler(r)
 	err := http.ListenAndServe(GetPort(), r)
