@@ -82,7 +82,7 @@ func updateBook(w http.ResponseWriter, r *http.Request) {
 
 // Delete a book
 func deleteBook(w http.ResponseWriter, r *http.Request) {
-	setupResponse(w, r)
+	setupCorsResponse(&w, r)
 	if (*r).Method == "OPTIONS" {
 		return
 	}
@@ -99,10 +99,10 @@ func deleteBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(books)
 }
 
-func setupResponse(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+func setupCorsResponse(w *http.ResponseWriter, r *http.Request) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Authorization")
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -114,7 +114,7 @@ func GetPort() string {
 	var port = os.Getenv("PORT")
 	// Set a default port if there is nothing in the environment
 	if port == "" {
-		port = "8000"
+		port = "8080"
 		fmt.Println("INFO: No PORT environment variable detected, defaulting to " + port)
 	}
 	return ":" + port
