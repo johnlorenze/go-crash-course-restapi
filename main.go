@@ -33,8 +33,12 @@ type Author struct {
 
 // Get All Books
 func getBooks(w http.ResponseWriter, r *http.Request) {
+	setupCorsResponse(&w, r)
+	if (*r).Method == "OPTIONS" {
+		fmt.Println("OPTIONS ARE CALLED")
+		return
+	}
 	w.Header().Set("content-type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(books)
 }
 
@@ -82,6 +86,7 @@ func updateBook(w http.ResponseWriter, r *http.Request) {
 
 // Delete a book
 func deleteBook(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("DELETE METHOD")
 	setupCorsResponse(&w, r)
 	if (*r).Method == "OPTIONS" {
 		fmt.Println("OPTIONS ARE CALLED")
