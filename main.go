@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
@@ -32,18 +33,13 @@ type Author struct {
 
 // Get All Books
 func getBooks(w http.ResponseWriter, r *http.Request) {
-	setupCorsResponse(&w, r)
-	if (*r).Method == "OPTIONS" {
-		fmt.Println("OPTIONS ARE CALLED")
-		return
-	}
 	w.Header().Set("content-type", "application/json")
 	json.NewEncoder(w).Encode(books)
 }
 
 // Get Single Book
 func getBook(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("content-type", "application/json")
 	params := mux.Vars(r) // Get params
 	// Loop through books and find with ID
 	for _, item := range books {
@@ -57,7 +53,7 @@ func getBook(w http.ResponseWriter, r *http.Request) {
 
 // Create a new book
 func createBook(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("content-type", "application/json")
 	var book Book
 	_ = json.NewDecoder(r.Body).Decode(&book)
 	book.ID = strconv.Itoa(rand.Intn(10000000))
@@ -67,7 +63,7 @@ func createBook(w http.ResponseWriter, r *http.Request) {
 
 // Update a book
 func updateBook(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("content-type", "application/json")
 	params := mux.Vars(r)
 	for index, item := range books {
 		if item.ID == params["id"] {
@@ -85,15 +81,7 @@ func updateBook(w http.ResponseWriter, r *http.Request) {
 
 // Delete a book
 func deleteBook(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("DELETE METHOD")
-	setupCorsResponse(&w, r)
-	if (*r).Method == "OPTIONS" {
-		fmt.Println("OPTIONS ARE CALLED")
-		return
-	}
-
 	w.Header().Set("content-type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	params := mux.Vars(r)
 	for index, item := range books {
 		if item.ID == params["id"] {
@@ -104,14 +92,8 @@ func deleteBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(books)
 }
 
-func setupCorsResponse(w *http.ResponseWriter, r *http.Request) {
-	(*w).Header().Set("Access-Control-Allow-Origin", "*")
-	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Authorization")
-}
-
-func home(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello. This is our first Go web app on Heroku!")
+func rootEndpoint(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hello. This is our first Go web app!")
 }
 
 func GetPort() string {
@@ -134,25 +116,21 @@ func main() {
 	books = append(books, Book{ID: "2", Isbn: "548743", Title: "Book Two", Author: &Author{Firstname: "Bob", Lastname: "Smith"}})
 
 	// Route Handlers / Endpoints
-	r.HandleFunc("/", home)
+	r.HandleFunc("/", rootEndpoint)
 	r.HandleFunc("/api/books", getBooks).Methods("GET")
 	r.HandleFunc("/api/books/{id}", getBook).Methods("GET")
 	r.HandleFunc("/api/books", createBook).Methods("POST")
 	r.HandleFunc("/api/books/{id}", updateBook).Methods("PUT")
-	r.HandleFunc("/api/books/{id}", deleteBook).Methods("DELETE", "OPTIONS")
+	r.HandleFunc("/api/books/{id}", deleteBook).Methods("DELETE")
 
-	fmt.Println("listening...")
+	fmt.Println("listening to port", string(GetPort()[1:len(GetPort())]))
 
-	// c := cors.New(cors.Options{
-	// 	AllowedOrigins:   []string{"http://localhost:3000"},
-	// 	AllowCredentials: true,
-	// })
+	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
+	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"})
+	origins := handlers.AllowedOrigins([]string{"*"})
 
-	// handler := c.Handler(r)
-	err := http.ListenAndServe(GetPort(), r)
+	err := http.ListenAndServe(GetPort(), handlers.CORS(headers, methods, origins)(r))
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
-
-	//log.Fatal(http.ListenAndServe(":8000", r))
 }
