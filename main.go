@@ -149,8 +149,8 @@ func main() {
 		AllowCredentials: true,
 	})
 
-	handler := c.Handler(r)
-	err := http.ListenAndServe(GetPort(), handler)
+	// handler := c.Handler(r)
+	err := http.ListenAndServe(GetPort(), r)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
