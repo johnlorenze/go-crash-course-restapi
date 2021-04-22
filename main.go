@@ -9,9 +9,9 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 )
 
 // Init books var as a slice Book struct
@@ -111,7 +111,7 @@ func setupCorsResponse(w *http.ResponseWriter, r *http.Request) {
 	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Authorization")
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
+func home(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello. This is our first Go web app on Heroku!")
 }
 
@@ -135,7 +135,7 @@ func main() {
 	books = append(books, Book{ID: "2", Isbn: "548743", Title: "Book Two", Author: &Author{Firstname: "Bob", Lastname: "Smith"}})
 
 	// Route Handlers / Endpoints
-	r.HandleFunc("/", handler)
+	r.HandleFunc("/", home)
 	r.HandleFunc("/api/books", getBooks).Methods("GET")
 	r.HandleFunc("/api/books/{id}", getBook).Methods("GET")
 	r.HandleFunc("/api/books", createBook).Methods("POST")
@@ -143,7 +143,14 @@ func main() {
 	r.HandleFunc("/api/books/{id}", deleteBook).Methods("DELETE", "OPTIONS")
 
 	fmt.Println("listening...")
-	err := http.ListenAndServe(GetPort(), handlers.CORS()(r))
+
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:8000"},
+		AllowCredentials: true,
+	})
+
+	handler := c.Handler(r)
+	err := http.ListenAndServe(GetPort(), handler)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
